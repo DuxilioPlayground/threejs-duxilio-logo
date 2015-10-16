@@ -3,16 +3,14 @@ var scene,
     renderer,
     controls;
 
-var meshes = [];
-
 init();
 animate();
 render();
 
-function generateBox(){
+function generateBox(width, height, depth, rgb){
     var box, material, mesh;
 
-    box = new THREE.BoxGeometry(800, 200, 200);
+    box = new THREE.BoxGeometry(width, height, depth);
     material = new THREE.MeshBasicMaterial({
         vertexColors: THREE.FaceColors,
         color: 0x59a4d4
@@ -21,7 +19,7 @@ function generateBox(){
     var face, color;
     for (var i = 0; i < box.faces.length; i++) {
         face = box.faces[i];
-        color = new THREE.Color('rgb('+(89-(i*12))+', '+(164-(i*12))+', '+(212-(i*12))+')');
+        color = new THREE.Color('rgb('+rgb.join(',')+')');
         face.color = color;
     }
 
@@ -37,15 +35,34 @@ function init() {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
     camera.position.z = 1000;
 
-    var mesh = generateBox();
-    mesh.rotation.y = 150;
-    scene.add(mesh);
-    meshes.push(mesh);
+    var group = new THREE.Object3D();
 
-    mesh = generateBox();
+    //color dark-light 55,81,159
+    var mesh = generateBox(320, 300, 1, [55,81,159]);
+    mesh.rotation.y = 150;
+    mesh.position.set(92, 0, 220);
+    group.add(mesh);
+
+    //color dark-dark 68,67,149
+    mesh = generateBox(320, 300, 1, [68,67,149]);
     mesh.rotation.y = -150;
-    scene.add(mesh);
-    meshes.push(mesh);
+    mesh.position.set(-132, 0, 220);
+    group.add(mesh);
+
+    //color light-dark 48,157,196
+    var mesh = generateBox(400, 300, 1, [48,157,196]);
+    mesh.rotation.y = 150;
+    mesh.position.set(-163, -1, -140);
+    group.add(mesh);
+
+    //color light-light 47,178,196
+    mesh = generateBox(400, 300, 1, [47,178,196]);
+    mesh.rotation.y = -150;
+    mesh.position.set(117, -1, -140);
+    group.add(mesh);
+
+    group.rotation.x = 0.9;
+    scene.add(group);
 
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(0x0f445c);
@@ -60,11 +77,6 @@ function init() {
 function animate() {
     requestAnimationFrame(animate);
     controls.update();
-
-    // meshes.forEach(function(mesh, idx){
-    //     mesh.rotation.x += 0.01*(idx+1);
-    //     mesh.rotation.y += 0.02*(idx+1);
-    // });
 }
 
 function render(){
